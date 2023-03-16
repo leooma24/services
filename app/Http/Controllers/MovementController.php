@@ -29,7 +29,9 @@ class MovementController extends Controller
         $items = Category::where('user_id', $user_id)->withSum(['movements' => function($q) use ($request) {
             $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
                 ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d') );
-        }], 'amount')->get()
+        }], 'amount')
+            ->orderBy('movements_sum_amount', 'desc')
+            ->get()
             ->toArray();
 
         return response()->json([
