@@ -60,7 +60,7 @@ class CategorySeeder extends Seeder
             'title' => 'Entretenimiento',
             'type' => 1,
             'color' => '#CC1830',
-            'icon' => 'health_and_safety'
+            'icon' => 'liquor'
         ]);
 
         DB::table('categories')->insert([
@@ -68,7 +68,7 @@ class CategorySeeder extends Seeder
             'title' => 'Salud',
             'type' => 1,
             'color' => '#2D9595',
-            'icon' => 'sports'
+            'icon' => 'monitor_heart'
         ]);
 
         DB::table('categories')->insert([

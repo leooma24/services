@@ -26,6 +26,7 @@ Route::post('login', [AuthController::class, 'authenticate']);
 Route::post('register', [AuthController::class, 'register']);
 Route::post('recover', [AuthController::class, 'recover']);
 Route::post('reset', [AuthController::class, 'restore_password']);
+Route::get('me', [AuthController::class, 'me']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('/movements', [MovementController::class, 'index']);
