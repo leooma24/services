@@ -88,7 +88,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $record = Section::find($id);
+        $record = Category::find($id);
         $record->status = 0;
         $record->save();
 

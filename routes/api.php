@@ -33,6 +33,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('/movements/records', [MovementController::class, 'getMovements']);
     Route::put('/movements', [MovementController::class, 'store']);
     Route::post('/movements/update/{id}', [MovementController::class, 'update']);
+    Route::delete('/movements/{id}', [MovementController::class, 'destroy']);
 
     Route::put('/categories', [CategoryController::class, 'store']);
     Route::get('/categories', [CategoryController::class, 'index']);

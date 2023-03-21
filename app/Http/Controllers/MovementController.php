@@ -124,4 +124,18 @@ class MovementController extends Controller
 
         return response()->json(empty($records) ? [] : $records);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $record = Movement::find($id);
+        $record->delete();
+
+        return response()->json('OK');
+    }
 }
