@@ -35,6 +35,8 @@ class MovementController extends Controller
             ->toArray();
 
         return response()->json([
+            'incomes' => $incomes,
+            'liabilities' => $liabilities,
             'last' => $incomes - $liabilities,
             'records' => $items
         ]);
