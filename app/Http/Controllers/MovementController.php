@@ -20,11 +20,11 @@ class MovementController extends Controller
         $user_id = auth()->user()->id;
         $incomes = Movement::where('type', 0)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+            ->where('date', '<', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
             ->sum('amount');
         $liabilities = Movement::where('type', 1)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+            ->where('date', '<', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
             ->sum('amount');
         $items = Category::where('user_id', $user_id)->withSum(['movements' => function($q) use ($request) {
             $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
