@@ -31,6 +31,7 @@ Route::get('me', [AuthController::class, 'me']);
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('/movements', [MovementController::class, 'index']);
     Route::post('/movements/records', [MovementController::class, 'getMovements']);
+    Route::post('/movements/byType', [MovementController::class, 'getMovementsByType']);
     Route::put('/movements', [MovementController::class, 'store']);
     Route::post('/movements/update/{id}', [MovementController::class, 'update']);
     Route::delete('/movements/{id}', [MovementController::class, 'destroy']);

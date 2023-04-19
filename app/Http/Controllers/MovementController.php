@@ -127,6 +127,28 @@ class MovementController extends Controller
         return response()->json(empty($records) ? [] : $records);
     }
 
+    public function getMovementsByType(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'type' => 'integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->fails(), 500);
+        }
+
+        $records = Movement::where('type', $request->type)
+            ->with('category')
+            ->where('user_id', auth()->user()->id)
+            ->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+            ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d'))
+            ->orderBy('date', 'desc')
+            ->get()
+            ->toArray();
+
+        return response()->json(empty($records) ? [] : $records);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
