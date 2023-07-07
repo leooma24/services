@@ -30,8 +30,28 @@ class MovementController extends Controller
             $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
                 ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d') );
         }], 'amount')
+            ->withCount(['movements' => function($q) use ($request) {
+                $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+                    ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d') );
+            }], 'count')
             ->orderBy('movements_sum_amount', 'desc')
             ->get()
+            ->transform(function($item) use($request, $user_id) {
+                $lastDate = Carbon::parse($request->date)->subMonth();
+                $item->last = Movement::where('type', $item->type)
+                    ->where('category_id', $item->id)
+                    ->where('user_id', $user_id)
+                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d'))
+                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d'))
+                    ->sum('amount');
+                $item->count = Movement::where('type', $item->type)
+                    ->where('category_id', $item->id)
+                    ->where('user_id', $user_id)
+                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d'))
+                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d'))
+                    ->count();
+                return $item;
+            })
             ->toArray();
 
         return response()->json([

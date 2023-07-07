@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PhraseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +27,11 @@ Route::post('login', [AuthController::class, 'authenticate']);
 Route::post('register', [AuthController::class, 'register']);
 Route::post('recover', [AuthController::class, 'recover']);
 Route::post('reset', [AuthController::class, 'restore_password']);
-Route::get('me', [AuthController::class, 'me']);
+
 
 Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::get('me', [AuthController::class, 'me']);
+
     Route::post('/movements', [MovementController::class, 'index']);
     Route::post('/movements/records', [MovementController::class, 'getMovements']);
     Route::post('/movements/byType', [MovementController::class, 'getMovementsByType']);
@@ -40,6 +43,11 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::post('/categories/update/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    Route::put('/phrases', [PhraseController::class, 'store']);
+    Route::get('/phrases', [PhraseController::class, 'index']);
+    Route::post('/phrases/update/{id}', [PhraseController::class, 'update']);
+    Route::delete('/phrases/{id}', [PhraseController::class, 'destroy']);
 });
 
 
