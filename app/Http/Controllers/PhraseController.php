@@ -86,4 +86,14 @@ class PhraseController extends Controller
 
         return response()->json('OK');
     }
+
+    public function getRandom(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $row = Phrase::where('user_id', $user_id)
+            ->inRandomOrder()->first();
+
+        return response()->json($row);
+    }
 }

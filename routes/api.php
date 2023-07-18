@@ -46,6 +46,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::put('/phrases', [PhraseController::class, 'store']);
     Route::get('/phrases', [PhraseController::class, 'index']);
+    Route::post('/phrases/getRandom', [PhraseController::class, 'getRandom']);
     Route::post('/phrases/update/{id}', [PhraseController::class, 'update']);
     Route::delete('/phrases/{id}', [PhraseController::class, 'destroy']);
 });
