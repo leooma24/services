@@ -83,14 +83,30 @@ class MovementController extends Controller
 
         // = $validator->validated();
         $category = Category::find($request->category_id['id']);
+        $paid = null;
+        if(isset($request->paid_id['id'])) {
+            $paid = Category::find($request->paid_id['id']);
+            Movement::create(
+                array_merge(
+                    [
+                        'user_id' => auth()->user()->id,
+                        'category_id' => $paid->id,
+                        'type' => $paid->type,
+                        'paid_id' => 0,
+                    ],
+                    $request->except(['category_id', 'paid_id'])
+                )
+            );
+        }
         $record = Movement::create(
             array_merge(
                 [
                     'user_id' => auth()->user()->id,
                     'category_id' => $category->id,
                     'type' => $category->type,
+                    'paid_id' => $paid->id ?? 0,
                 ],
-                $request->except('category_id')
+                $request->except(['category_id', 'paid_id'])
             )
         );
 
