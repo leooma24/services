@@ -135,7 +135,7 @@ class MovementController extends Controller
             [
                 'category_id' => $category->id,
             ],
-            $request->except('category_id')
+            $request->except(['category_id', 'paid_id'])
         ));
 
         return response()->json($record);
