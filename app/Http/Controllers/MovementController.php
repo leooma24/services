@@ -28,13 +28,13 @@ class MovementController extends Controller
         // Obtener los ingresos
         $incomes = Movement::where('type', 0)
             ->where('user_id', $user_id)
-            ->whereDate('date', '<=', $startOfMonth)
+            //->whereDate('date', '<=', $startOfMonth)
             ->sum('amount');
 
         // Obtener los pasivos (gastos o deudas)
         $liabilities = Movement::where('type', 1)
             ->where('user_id', $user_id)
-            //->whereDate('date', '<=', $startOfMonth)
+            ->whereDate('date', '<=', $startOfMonth)
             ->sum('amount');
 
         // Obtener los items (categorías con movimientos del mes)
