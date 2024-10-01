@@ -21,19 +21,19 @@ class MovementController extends Controller
         $user_id = auth()->user()->id;
         $incomes = Movement::where('type', 0)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
             ->sum('amount');
         $liabilities = Movement::where('type', 1)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
+            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
             ->sum('amount');
         $items = Category::where('user_id', $user_id)->withSum(['movements' => function($q) use ($request) {
-            $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
-                ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d') );
+            $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
+                ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d 23:59:59') );
         }], 'amount')
             ->withCount(['movements' => function($q) use ($request) {
-                $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
-                    ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d') );
+                $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
+                    ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d 23:59:59') );
             }], 'count')
             ->orderBy('movements_sum_amount', 'desc')
             ->get()
@@ -42,14 +42,14 @@ class MovementController extends Controller
                 $item->last = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d'))
-                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d'))
+                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d 00:00:00'))
+                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d 23:59:59'))
                     ->sum('amount');
                 $item->count = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d'))
-                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d'))
+                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d 00:00:00'))
+                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d 23:59:59'))
                     ->count();
                 return $item;
             })
