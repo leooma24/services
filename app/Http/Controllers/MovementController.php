@@ -21,19 +21,19 @@ class MovementController extends Controller
         $user_id = auth()->user()->id;
         $incomes = Movement::where('type', 0)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
+            ->whereDate('date', '<=', Carbon::parse($request->date)->startOfMonth())
             ->sum('amount');
         $liabilities = Movement::where('type', 1)
             ->where('user_id', $user_id)
-            ->where('date', '<=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
+            ->whereDate('date', '<=', Carbon::parse($request->date)->startOfMonth())
             ->sum('amount');
         $items = Category::where('user_id', $user_id)->withSum(['movements' => function($q) use ($request) {
-            $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
-                ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d 23:59:59') );
+            $q->whereDate('date', '>=', Carbon::parse($request->date)->startOfMonth())
+                ->whereDate('date', '<=', Carbon::parse($request->date)->endOfMonth() );
         }], 'amount')
             ->withCount(['movements' => function($q) use ($request) {
-                $q->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d 00:00:00'))
-                    ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d 23:59:59') );
+                $q->whereDate('date', '>=', Carbon::parse($request->date)->startOfMonth())
+                    ->whereDate('date', '<=', Carbon::parse($request->date)->endOfMonth());
             }], 'count')
             ->orderBy('movements_sum_amount', 'desc')
             ->get()
@@ -42,14 +42,14 @@ class MovementController extends Controller
                 $item->last = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d 00:00:00'))
-                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d 23:59:59'))
+                    ->whereDate('date', '>=', $lastDate->startOfMonth())
+                    ->whereDate('date', '<=', $lastDate->endOfMonth())
                     ->sum('amount');
                 $item->count = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->where('date', '>=', $lastDate->startOfMonth()->format('Y-m-d 00:00:00'))
-                    ->where('date', '<=', $lastDate->endOfMonth()->format('Y-m-d 23:59:59'))
+                    ->whereDate('date', '>=', $lastDate->startOfMonth())
+                    ->whereDate('date', '<=', $lastDate->endOfMonth())
                     ->count();
                 return $item;
             })
@@ -155,8 +155,8 @@ class MovementController extends Controller
         $records = Movement::where('category_id', $request->category_id)
             ->with('category')
             ->where('user_id', auth()->user()->id)
-            ->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
-            ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d'))
+            ->where('date', '>=', Carbon::parse($request->date)->startOfMonth())
+            ->where('date', '<=', Carbon::parse($request->date)->endOfMonth())
             ->orderBy('date', 'desc')
             ->get()
             ->toArray();
@@ -177,8 +177,8 @@ class MovementController extends Controller
         $records = Movement::where('type', $request->type)
             ->with('category')
             ->where('user_id', auth()->user()->id)
-            ->where('date', '>=', Carbon::parse($request->date)->startOfMonth()->format('Y-m-d'))
-            ->where('date', '<=', Carbon::parse($request->date)->endOfMonth()->format('Y-m-d'))
+            ->where('date', '>=', Carbon::parse($request->date)->startOfMonth())
+            ->where('date', '<=', Carbon::parse($request->date)->endOfMonth())
             ->orderBy('date', 'desc')
             ->get()
             ->toArray();
