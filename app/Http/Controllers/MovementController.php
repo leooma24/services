@@ -21,37 +21,40 @@ class MovementController extends Controller
         // Obtener el usuario autenticado
         $user_id = auth()->user()->id;
 
+        // Verificar que $request->date esté llegando correctamente
+        $selectedDate = $request->date ?? Carbon::now(); // Si no se proporciona la fecha, usar la actual
+
         // Obtener la fecha inicial y final del mes actual (basada en el request)
-        $startOfMonth = Carbon::parse($request->date)->startOfMonth();
-        $endOfMonth = Carbon::parse($request->date)->endOfMonth()->endOfDay(); // Asegurarse de incluir hasta el último segundo del mes
+        $startOfMonth = Carbon::parse($selectedDate)->startOfMonth();
+        $endOfMonth = Carbon::parse($selectedDate)->endOfMonth()->endOfDay(); // Asegurarse de incluir hasta el último segundo del mes
 
         // Obtener los ingresos
         $incomes = Movement::where('type', 0)
             ->where('user_id', $user_id)
-            ->whereDate('date', '<=', $startOfMonth)
+            ->where('date', '<=', $endOfMonth) // Asegurarse de incluir hasta el fin del mes correctamente
             ->sum('amount');
 
         // Obtener los pasivos (gastos o deudas)
         $liabilities = Movement::where('type', 1)
             ->where('user_id', $user_id)
-            ->whereDate('date', '<=', $startOfMonth)
+            ->where('date', '<=', $endOfMonth)
             ->sum('amount');
 
         // Obtener los items (categorías con movimientos del mes)
         $items = Category::where('user_id', $user_id)
             ->withSum(['movements' => function($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereDate('date', '>=', $startOfMonth)
-                ->whereDate('date', '<=', $endOfMonth);
+                $q->where('date', '>=', $startOfMonth)
+                ->where('date', '<=', $endOfMonth); // Usar 'where' en lugar de 'whereDate' si la columna 'date' incluye horas
             }], 'amount')
             ->withCount(['movements' => function($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereDate('date', '>=', $startOfMonth)
-                ->whereDate('date', '<=', $endOfMonth);
+                $q->where('date', '>=', $startOfMonth)
+                ->where('date', '<=', $endOfMonth);
             }], 'count')
             ->orderBy('movements_sum_amount', 'desc')
             ->get()
-            ->transform(function($item) use($request, $user_id) {
+            ->transform(function($item) use($selectedDate, $user_id) {
                 // Obtener el mes anterior
-                $lastDate = Carbon::parse($request->date)->subMonth();
+                $lastDate = Carbon::parse($selectedDate)->subMonth();
                 $startOfLastMonth = $lastDate->startOfMonth();
                 $endOfLastMonth = $lastDate->endOfMonth()->endOfDay(); // Incluir todo el último día del mes anterior
 
@@ -59,15 +62,15 @@ class MovementController extends Controller
                 $item->last = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->whereDate('date', '>=', $startOfLastMonth)
-                    ->whereDate('date', '<=', $endOfLastMonth)
+                    ->where('date', '>=', $startOfLastMonth)
+                    ->where('date', '<=', $endOfLastMonth)
                     ->sum('amount');
 
                 $item->count = Movement::where('type', $item->type)
                     ->where('category_id', $item->id)
                     ->where('user_id', $user_id)
-                    ->whereDate('date', '>=', $startOfLastMonth)
-                    ->whereDate('date', '<=', $endOfLastMonth)
+                    ->where('date', '>=', $startOfLastMonth)
+                    ->where('date', '<=', $endOfLastMonth)
                     ->count();
 
                 return $item;
